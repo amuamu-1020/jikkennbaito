@@ -1,0 +1,44 @@
+name: Web Monitor
+
+on:
+  schedule:
+    # 15分毎に自動巡回（JST基準ではなくUTC基準）
+    - cron: '*/15 * * * *'
+  workflow_dispatch: # 手動で「Run workflow」を押すテスト用
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    steps:
+      - name: リポジトリの取得
+        uses: actions/checkout@v4
+
+      - name: Python環境のセットアップ
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: ライブラリをインストール
+        run: pip install -r requirements.txt
+
+      - name: 前回のハッシュ状態を復元（Cache）
+        uses: actions/cache@v4
+        with:
+          path: last_hash.txt
+          key: hash-file-${{ github.run_id }}
+          restore-keys: |
+            hash-file-
+
+      - name: Pythonスクリプトの実行
+        env:
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_PASS: ${{ secrets.GMAIL_PASS }}
+          TO_EMAIL: ${{ secrets.TO_EMAIL }}
+        run: python main.py
+
+      - name: ハッシュ値を保存
+        uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: last_hash.txt
+          key: hash-file-${{ github.run_id }}
