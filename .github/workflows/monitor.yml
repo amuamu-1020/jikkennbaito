@@ -5,6 +5,9 @@ on:
     # 15分毎に自動巡回（JST基準ではなくUTC基準）
     - cron: '*/15 * * * *'
   workflow_dispatch: # 手動で「Run workflow」を押すテスト用
+  repository_dispatch:               # ← これを追加！
+    types: [trigger-monitor]
+
 
 jobs:
   monitor:
