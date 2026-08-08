@@ -99,4 +99,4 @@ def check_for_updates():
 
 
 if __name__ == "__main__":
-    send_email_notification("【テスト通知】動作確認", "このメールが届いていれば通知機能は正常です！")
+    check_for_updates()
